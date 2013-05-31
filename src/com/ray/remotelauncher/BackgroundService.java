@@ -1,22 +1,19 @@
 package com.ray.remotelauncher;
 
-import java.io.IOException;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceInfo;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 import android.app.Service;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.MulticastLock;
 import android.os.IBinder;
 
 public class BackgroundService extends Service {
 
-    public static final String SERVICE_TYPE = "_http._tcp.";
-    
-    private JmDNS jmdns = null;
-    private MulticastLock lock;
+	private ServerSocket mServerSocket = null;
+    private Socket mSocket = null;
     
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -27,36 +24,59 @@ public class BackgroundService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		
-		setupServer();
-	}
-	
-	private void setupServer() {
-		WifiManager wifi = (WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
-        lock = wifi.createMulticastLock("mylockthereturn");
-        lock.setReferenceCounted(true);
-        lock.acquire();
-		try {
-			jmdns = JmDNS.create();
-			jmdns.registerService(ServiceInfo.create(SERVICE_TYPE, "RemoteLauncher", 0, "RemoteLauncher Server"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new Thread(new SocketThread()).start();
 	}
 
 	@Override
 	public void onDestroy() {
-		if (jmdns != null) {
-			jmdns.unregisterAllServices();
-			
+
+		
+		super.onDestroy();
+	}
+	
+	private class SocketThread implements Runnable {
+
+		@Override
+		public void run() {
 			try {
-				jmdns.close();
+				mServerSocket = new ServerSocket(2088);
+
+            	if (mSocket != null && mSocket.isConnected()) {
+            		mSocket.close();
+            	}
+            	mSocket = mServerSocket.accept();
+
+            	new Thread(new ReceivingThread()).start();
+            	
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			jmdns = null;
 		}
-        lock.release();
 		
-		super.onDestroy();
+	}
+	
+	private class ReceivingThread implements Runnable {
+
+		@Override
+		public void run() {
+        	if (mSocket == null || !mSocket.isConnected()) {
+				return;
+        	}
+        	
+        	try {
+				InputStream in = mSocket.getInputStream();
+				byte[] buffer = new byte[512];
+				int len = 0;
+				
+				while ((len = in.read(buffer)) >= 0) {
+					if (len >= 1) {
+						
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 }
