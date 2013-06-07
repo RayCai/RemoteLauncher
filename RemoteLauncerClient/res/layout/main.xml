@@ -4,17 +4,9 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity" >
 
-    <GridView
-        android:id="@+id/appView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"  
-	    android:verticalSpacing="10dp"
-	    android:horizontalSpacing="10dp"
-        >
-    </GridView>
-
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    
 </RelativeLayout>
