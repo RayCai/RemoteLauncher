@@ -90,7 +90,16 @@ public class BackgroundService extends Service {
 		}
 	}
 	
-	private enum SOCKET_CMD {NONE, REFRESH_LIST, OPEN_ACTIVITY};
+	private SerializableBitmap getAppIcon(short idx) {
+		if (appList != null && idx >=0 && idx < appList.size()) {
+			ApplicationInfo app = appList.get(idx);
+			SerializableBitmap bitmap = new SerializableBitmap(app.GetIconBytes());
+			return bitmap;
+		}
+		return null;
+	}
+	
+	private enum SOCKET_CMD {NONE, REFRESH_LIST, OPEN_ACTIVITY, GET_ICON};
 	
 	private class SocketThread implements Runnable {
 
@@ -104,6 +113,8 @@ public class BackgroundService extends Service {
 				return SOCKET_CMD.REFRESH_LIST;
 			case 2:
 				return SOCKET_CMD.OPEN_ACTIVITY;
+			case 3:
+				return SOCKET_CMD.GET_ICON;
 			}
 			return SOCKET_CMD.NONE;
 		}
@@ -133,7 +144,11 @@ public class BackgroundService extends Service {
 	    				len = in.read(buffer);
 						Log.i(TAG, "BackgroundService, Read buffer, len = " + len);
 						
-	    				if (len < 0) break;
+	    				if (len < 0) {
+	    					in.close();
+	    					oos.close();
+	    					break;
+	    				}
 	    				else if (len >= 1) {
 	    					SOCKET_CMD cmd = ParseCommand(buffer[0]);
 	    					switch (cmd) {
@@ -149,6 +164,17 @@ public class BackgroundService extends Service {
 									Log.i(TAG, "BackgroundService, CMD: Open Activity, target: " + appIdx);
 									
 									openActivity(appIdx);
+								}
+								break;
+							case GET_ICON:
+								Log.i(TAG, "BackgroundService, CMD: Get app icon");
+								if (len >= 3) {
+									short appIdx = Byte2Short(buffer, 1);
+									Log.i(TAG, "BackgroundService, CMD: Get app icon, target: " + appIdx);
+									SerializableBitmap bitmap = getAppIcon(appIdx);
+									if (bitmap != null) {
+										oos.writeObject(bitmap);
+									}
 								}
 								break;
 							default:

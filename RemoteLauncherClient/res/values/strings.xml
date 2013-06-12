@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="apps">Apps</string>
     <string name="remote_control">Remote Control</string>
+    <string name="icon_desc">Icon</string>
 
 </resources>

@@ -1,29 +1,41 @@
-package com.ray.remotelauncerclient;
+package com.ray.remotelauncher.client;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity  {
 
-	private ViewPager viewPager;
+	private ViewPager mViewPager;
+	private ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		viewPager = (ViewPager)findViewById(R.id.view_pager);
+		mViewPager = (ViewPager)findViewById(R.id.view_pager);
+		
+		fragments.add(Fragment.instantiate(this, FragmentAppList.class.getName()));
+		fragments.add(Fragment.instantiate(this, FragmentRemoteControl.class.getName()));
+		
+		MyPagerAdapter adapter = new MyPagerAdapter(getSupportFragmentManager());
+		mViewPager.setOffscreenPageLimit(2);
+		mViewPager.setAdapter(adapter);
+		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+	        @Override
+	        public void onPageSelected(int position) {
+	            getActionBar().setSelectedNavigationItem(position);
+	        }
+		});
 		
 		ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -36,7 +48,7 @@ public class MainActivity extends Activity {
 		tab = actionBar.newTab().setText(R.string.remote_control).setTabListener(tabListener);
 		actionBar.addTab(tab);
 	}
-
+    
 	private class MyTabListener implements TabListener {
 
 		@Override
@@ -45,8 +57,8 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-			if (viewPager.getCurrentItem() != tab.getPosition())
-				viewPager.setCurrentItem(tab.getPosition());
+			if (mViewPager.getCurrentItem() != tab.getPosition())
+				mViewPager.setCurrentItem(tab.getPosition());
 		}
 
 		@Override
@@ -56,22 +68,20 @@ public class MainActivity extends Activity {
 	}
 	
 	private class MyPagerAdapter extends FragmentPagerAdapter {
-        List<Fragment> list = new ArrayList<Fragment>();
         
 		public MyPagerAdapter(FragmentManager fm) {
             super(fm);
+            
         }
 		
 		@Override
 		public Fragment getItem(int arg0) {
-			// TODO Auto-generated method stub
-			return null;
+			return fragments.get(arg0);
 		}
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
-			return 0;
+			return fragments.size();
 		}
 		
 	}
