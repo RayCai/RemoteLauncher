@@ -12,6 +12,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.text.InputFilter.LengthFilter;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity  {
 
@@ -23,6 +29,9 @@ public class MainActivity extends FragmentActivity  {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		mViewPager = (ViewPager)findViewById(R.id.view_pager);
+		TextView serverName = (TextView)findViewById(R.id.server_name);
+		serverName.setOnClickListener(new ServerNameClickListener());
+		serverName.setOnLongClickListener(new ServerNameLongClickListener());
 		
 		fragments.add(Fragment.instantiate(this, FragmentAppList.class.getName()));
 		fragments.add(Fragment.instantiate(this, FragmentRemoteControl.class.getName()));
@@ -82,6 +91,25 @@ public class MainActivity extends FragmentActivity  {
 		@Override
 		public int getCount() {
 			return fragments.size();
+		}
+		
+	}
+	
+	private class ServerNameClickListener implements OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			Toast.makeText(getApplicationContext(), "test", Toast.LENGTH_LONG).show();
+		}
+		
+	}
+	
+	private class ServerNameLongClickListener implements OnLongClickListener {
+
+		@Override
+		public boolean onLongClick(View v) {
+			Toast.makeText(getApplicationContext(), "long click test", Toast.LENGTH_LONG).show();
+			return true;
 		}
 		
 	}
