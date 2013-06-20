@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 import com.ray.remotelauncher.ApplicationInfo;
 import com.ray.remotelauncher.SerializableBitmap;
-import com.ray.remotelauncher.tcp.Connectivity;
+import com.ray.remotelauncher.net.Connectivity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

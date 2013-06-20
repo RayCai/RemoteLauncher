@@ -2,20 +2,26 @@ package com.ray.remotelauncher.client;
 
 import java.util.ArrayList;
 
+import com.ray.remotelauncher.net.ServerDiscover;
+
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
+import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.text.InputFilter.LengthFilter;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.Window;
+import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,15 +29,33 @@ public class MainActivity extends FragmentActivity  {
 
 	private ViewPager mViewPager;
 	private ArrayList<Fragment> fragments = new ArrayList<Fragment>();
+	private ServerDiscover mServerDiscover;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY); 
 		setContentView(R.layout.main);
 		mViewPager = (ViewPager)findViewById(R.id.view_pager);
-		TextView serverName = (TextView)findViewById(R.id.server_name);
-		serverName.setOnClickListener(new ServerNameClickListener());
-		serverName.setOnLongClickListener(new ServerNameLongClickListener());
+		
+		mServerDiscover = new ServerDiscover(this);
+		SlidingDrawer slidingDrawer = (SlidingDrawer)findViewById(R.id.server_name_sliding);
+		slidingDrawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
+			
+				@Override
+				public void onDrawerOpened() {
+					mServerDiscover.discoverServices();
+				}
+			}
+		);
+		
+		slidingDrawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
+			
+			@Override
+			public void onDrawerClosed() {
+				mServerDiscover.stopDiscovery();
+			}
+		});
 		
 		fragments.add(Fragment.instantiate(this, FragmentAppList.class.getName()));
 		fragments.add(Fragment.instantiate(this, FragmentRemoteControl.class.getName()));
@@ -57,7 +81,14 @@ public class MainActivity extends FragmentActivity  {
 		tab = actionBar.newTab().setText(R.string.remote_control).setTabListener(tabListener);
 		actionBar.addTab(tab);
 	}
-    
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		
+	}
+
 	private class MyTabListener implements TabListener {
 
 		@Override
@@ -95,22 +126,4 @@ public class MainActivity extends FragmentActivity  {
 		
 	}
 	
-	private class ServerNameClickListener implements OnClickListener {
-
-		@Override
-		public void onClick(View v) {
-			Toast.makeText(getApplicationContext(), "test", Toast.LENGTH_LONG).show();
-		}
-		
-	}
-	
-	private class ServerNameLongClickListener implements OnLongClickListener {
-
-		@Override
-		public boolean onLongClick(View v) {
-			Toast.makeText(getApplicationContext(), "long click test", Toast.LENGTH_LONG).show();
-			return true;
-		}
-		
-	}
 }

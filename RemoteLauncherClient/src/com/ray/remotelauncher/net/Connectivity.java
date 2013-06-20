@@ -1,13 +1,10 @@
-package com.ray.remotelauncher.tcp;
+package com.ray.remotelauncher.net;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 
 import com.ray.remotelauncher.ApplicationInfo;
 import com.ray.remotelauncher.SerializableBitmap;
