@@ -3,6 +3,7 @@ package com.ray.remotelauncher.client;
 import java.util.ArrayList;
 
 import com.ray.remotelauncher.net.ServerDiscover;
+import com.sothree.SlidingUpPanelLayout;
 
 import android.os.Bundle;
 import android.app.ActionBar;
@@ -39,23 +40,8 @@ public class MainActivity extends FragmentActivity  {
 		mViewPager = (ViewPager)findViewById(R.id.view_pager);
 		
 		mServerDiscover = new ServerDiscover(this);
-		SlidingDrawer slidingDrawer = (SlidingDrawer)findViewById(R.id.server_name_sliding);
-		slidingDrawer.setOnDrawerOpenListener(new SlidingDrawer.OnDrawerOpenListener() {
-			
-				@Override
-				public void onDrawerOpened() {
-					mServerDiscover.discoverServices();
-				}
-			}
-		);
-		
-		slidingDrawer.setOnDrawerCloseListener(new SlidingDrawer.OnDrawerCloseListener() {
-			
-			@Override
-			public void onDrawerClosed() {
-				mServerDiscover.stopDiscovery();
-			}
-		});
+		SlidingUpPanelLayout slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
+		slidingLayout.setPanelHeight(30);
 		
 		fragments.add(Fragment.instantiate(this, FragmentAppList.class.getName()));
 		fragments.add(Fragment.instantiate(this, FragmentRemoteControl.class.getName()));
