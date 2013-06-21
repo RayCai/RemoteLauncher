@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
-import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -19,12 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.Window;
-import android.widget.SlidingDrawer;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity  {
 
@@ -41,7 +35,37 @@ public class MainActivity extends FragmentActivity  {
 		
 		mServerDiscover = new ServerDiscover(this);
 		SlidingUpPanelLayout slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
-		slidingLayout.setPanelHeight(30);
+		
+		final float density = getResources().getDisplayMetrics().density;
+		slidingLayout.setPanelHeight((int) (30 * density + 0.5f));
+		slidingLayout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
+		slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                if (slideOffset < 0.2) {
+                    if (getActionBar().isShowing()) {
+                        getActionBar().hide();
+                    }
+                } else {
+                    if (!getActionBar().isShowing()) {
+                        getActionBar().show();
+                    }
+                }
+            }
+
+            @Override
+            public void onPanelExpanded(View panel) {
+
+
+            }
+
+            @Override
+            public void onPanelCollapsed(View panel) {
+
+
+            }
+        });
 		
 		fragments.add(Fragment.instantiate(this, FragmentAppList.class.getName()));
 		fragments.add(Fragment.instantiate(this, FragmentRemoteControl.class.getName()));
