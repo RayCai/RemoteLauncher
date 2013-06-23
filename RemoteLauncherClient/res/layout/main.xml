@@ -37,7 +37,7 @@
 
 	            <fragment
 	                android:id="@+id/fragment_server_list"
-	                android:name="com.ray.remotelauncher.client.FragmentServerList"
+	                android:name="com.ray.remotelauncher.client.FragmentConnectServer"
 	                android:layout_width="match_parent"
 	                android:layout_height="match_parent" />
 	    		

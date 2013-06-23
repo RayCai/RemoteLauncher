@@ -38,6 +38,7 @@ public class MainActivity extends FragmentActivity  {
 		
 		final float density = getResources().getDisplayMetrics().density;
 		slidingLayout.setPanelHeight((int) (30 * density + 0.5f));
+		slidingLayout.setDragView(findViewById(R.id.server_name));
 		slidingLayout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
 		slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 
@@ -57,16 +58,12 @@ public class MainActivity extends FragmentActivity  {
             @Override
             public void onPanelExpanded(View panel) {
 
-            	FragmentServerList serverList = (FragmentServerList) getSupportFragmentManager().findFragmentById(R.id.fragment_server_list);
-            	serverList.startDiscovery();
 
             }
 
             @Override
             public void onPanelCollapsed(View panel) {
 
-            	FragmentServerList serverList = (FragmentServerList) getSupportFragmentManager().findFragmentById(R.id.fragment_server_list);
-            	serverList.stopDiscovery();
             }
         });
 		

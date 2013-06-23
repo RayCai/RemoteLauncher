@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class ServerDiscover {
 
-    public static final String SERVICE_TYPE = "_http._tcp.";//rc._tcp.local.
+    public static final String SERVICE_TYPE = "_http._tcp.local.";//
     public static final String TAG			= "ServerDiscover";
     
     private NsdManager 						mNsdManager			= null;
@@ -72,7 +72,7 @@ public class ServerDiscover {
             @Override
             public void onStartDiscoveryFailed(String serviceType, int errorCode) {
                 Log.e(TAG, "Discovery failed: Error code:" + errorCode);
-                mNsdManager.stopServiceDiscovery(this);
+                //mNsdManager.stopServiceDiscovery(this);
             }
 
             @Override

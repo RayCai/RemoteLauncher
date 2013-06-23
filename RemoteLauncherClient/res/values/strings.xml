@@ -9,5 +9,6 @@
     <string name="icon_desc">Icon</string>
     <string name="no_connection">Ops! No connection.</string>
     <string name="drag_to_discover_server">Drag here to show available Servers</string>
+    <string name="connect">Connect</string>
 
 </resources>
