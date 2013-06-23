@@ -7,5 +7,7 @@
     <string name="apps">Apps</string>
     <string name="remote_control">Remote Control</string>
     <string name="icon_desc">Icon</string>
+    <string name="no_connection">Ops! No connection.</string>
+    <string name="drag_to_discover_server">Drag here to show available Servers</string>
 
 </resources>

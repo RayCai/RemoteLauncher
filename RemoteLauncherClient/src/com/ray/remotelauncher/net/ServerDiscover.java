@@ -1,5 +1,7 @@
 package com.ray.remotelauncher.net;
 
+import java.net.InetAddress;
+
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
@@ -7,12 +9,14 @@ import android.util.Log;
 
 public class ServerDiscover {
 
-    public static final String SERVICE_TYPE = "_http._tcp.";
+    public static final String SERVICE_TYPE = "_http._tcp.";//rc._tcp.local.
     public static final String TAG			= "ServerDiscover";
     
     private NsdManager 						mNsdManager			= null;
     private NsdManager.ResolveListener		mResolveListener	= null;
     private NsdManager.DiscoveryListener	mDiscoveryListener	= null;
+    private ServerFoundListener				mServerFoundListener = null;
+    private boolean							mDiscovering		= false;
     
 	public ServerDiscover(Context context) {
 		mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -31,7 +35,9 @@ public class ServerDiscover {
             @Override
             public void onServiceResolved(NsdServiceInfo serviceInfo) {
                 Log.e(TAG, "Resolve Succeeded. " + serviceInfo);
-
+                if (mServerFoundListener != null) {
+                	mServerFoundListener.OnServerFound(serviceInfo.getServiceName(), serviceInfo.getHost(), serviceInfo.getPort());
+                }
             }
         };
         
@@ -80,9 +86,23 @@ public class ServerDiscover {
     public void discoverServices() {
         mNsdManager.discoverServices(
                 SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
+        mDiscovering = true;
     }
     
     public void stopDiscovery() {
         mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+        mDiscovering = false;
+    }
+    
+    public void setServerFoundListener(ServerFoundListener listener){
+    	mServerFoundListener = listener;
+    }
+    
+    public boolean isDiscovering() {
+    	return mDiscovering;
+    }
+    
+    public interface ServerFoundListener {
+    	public void OnServerFound(String serverName, InetAddress ip, int port);
     }
 }

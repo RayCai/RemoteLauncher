@@ -18,6 +18,15 @@ public class Connectivity {
 	private final static byte	Start_Activity		= 0x2;
 	private final static byte	Get_App_Icon		= 0x3;
 	
+	private static Connectivity conn				= null;
+	
+	public static Connectivity getInstance() {
+		if (conn == null) {
+			conn = new Connectivity();
+		}
+		return conn;
+	} 
+	
 	private byte[] Short2Byte(short num) {
 		byte[] buf = new byte[2];
 		buf[0] = (byte)(num & 0xFF);

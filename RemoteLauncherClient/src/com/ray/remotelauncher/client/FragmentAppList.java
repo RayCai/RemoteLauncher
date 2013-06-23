@@ -5,10 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,6 +12,7 @@ import com.ray.remotelauncher.ApplicationInfo;
 import com.ray.remotelauncher.SerializableBitmap;
 import com.ray.remotelauncher.net.Connectivity;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -40,7 +37,7 @@ public class FragmentAppList extends Fragment {
 	private ProgressBar 						mLoadProgressCircle = null;
 	private ArrayList<HashMap<String, Object>> 	mAppList 			= new ArrayList<HashMap<String, Object>>();
 	private SimpleAdapter 						mGridViewAdapter 	= null;
-	private Connectivity						mSocketConn			= new Connectivity();
+	private Connectivity						mSocketConn			= Connectivity.getInstance();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,17 +76,33 @@ public class FragmentAppList extends Fragment {
 			}
 			
 		});
-
-		LoadAppsTask task = new LoadAppsTask();
-		task.execute();
 		
 		return view;
+	}
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
+	public void RefreshAppList() {
+		LoadAppsTask task = new LoadAppsTask();
+		task.execute();
 	}
 	
 	private class LoadAppsTask extends AsyncTask<Integer, Integer, Integer> {
 
 		@Override
 		protected void onPreExecute() {
+			if (mAppList.size() > 0) {
+				mAppList.clear();
+				mGridViewAdapter.notifyDataSetChanged();
+			}
 			mLoadProgressCircle.setVisibility(View.VISIBLE);
 		}
 
@@ -97,7 +110,7 @@ public class FragmentAppList extends Fragment {
 		protected Integer doInBackground(Integer... params) {
 			Log.i("LoadAppsTask", "=======> Start");
 			
-			if (mSocketConn.connect("10.0.2.2", 3000))
+			if (mSocketConn.connect("192.168.0.107", 2088))
 			{
 				File cache = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/RemoteLauncherClient/Cache");
 				if (!cache.exists())
@@ -106,7 +119,6 @@ public class FragmentAppList extends Fragment {
 				ArrayList<ApplicationInfo> appList = mSocketConn.getApplist();
 				Log.i("LoadAppsTask", "app count: " + appList.size());
 				
-				mAppList.clear();
 				short i = 0;
 				for (ApplicationInfo app: appList) {
 					HashMap<String, Object> map = new HashMap<String, Object>();

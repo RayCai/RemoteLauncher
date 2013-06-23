@@ -2,6 +2,7 @@ package com.ray.remotelauncher.client;
 
 import java.util.ArrayList;
 
+import com.ray.remotelauncher.net.Connectivity;
 import com.ray.remotelauncher.net.ServerDiscover;
 import com.sothree.SlidingUpPanelLayout;
 
@@ -29,7 +30,6 @@ public class MainActivity extends FragmentActivity  {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY); 
 		setContentView(R.layout.main);
 		mViewPager = (ViewPager)findViewById(R.id.view_pager);
 		
@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity  {
 
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-                if (slideOffset < 0.2) {
+                /*if (slideOffset < 0.2) {
                     if (getActionBar().isShowing()) {
                         getActionBar().hide();
                     }
@@ -51,19 +51,22 @@ public class MainActivity extends FragmentActivity  {
                     if (!getActionBar().isShowing()) {
                         getActionBar().show();
                     }
-                }
+                }*/
             }
 
             @Override
             public void onPanelExpanded(View panel) {
 
+            	FragmentServerList serverList = (FragmentServerList) getSupportFragmentManager().findFragmentById(R.id.fragment_server_list);
+            	serverList.startDiscovery();
 
             }
 
             @Override
             public void onPanelCollapsed(View panel) {
 
-
+            	FragmentServerList serverList = (FragmentServerList) getSupportFragmentManager().findFragmentById(R.id.fragment_server_list);
+            	serverList.stopDiscovery();
             }
         });
 		
@@ -90,6 +93,23 @@ public class MainActivity extends FragmentActivity  {
 		actionBar.addTab(tab);
 		tab = actionBar.newTab().setText(R.string.remote_control).setTabListener(tabListener);
 		actionBar.addTab(tab);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
+	protected void onPause() {
+		Connectivity.getInstance().disconnect();
+		
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
 	}
 
 	@Override
