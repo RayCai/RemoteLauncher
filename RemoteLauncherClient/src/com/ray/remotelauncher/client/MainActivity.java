@@ -3,10 +3,14 @@ package com.ray.remotelauncher.client;
 import java.util.ArrayList;
 
 import com.ray.remotelauncher.net.Connectivity;
+import com.ray.remotelauncher.net.Connectivity.ConnectionListener;
 import com.ray.remotelauncher.net.ServerDiscover;
 import com.sothree.SlidingUpPanelLayout;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
@@ -19,13 +23,14 @@ import android.support.v4.view.ViewPager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
-import android.view.Window;
 
 public class MainActivity extends FragmentActivity  {
 
 	private ViewPager mViewPager;
 	private ArrayList<Fragment> fragments = new ArrayList<Fragment>();
-	private ServerDiscover mServerDiscover;
+	private SlidingUpPanelLayout mSlidingLayout = null;
+	private Handler mHandler = new MyHandler();
+//	private ServerDiscover mServerDiscover;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +38,14 @@ public class MainActivity extends FragmentActivity  {
 		setContentView(R.layout.main);
 		mViewPager = (ViewPager)findViewById(R.id.view_pager);
 		
-		mServerDiscover = new ServerDiscover(this);
-		SlidingUpPanelLayout slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
+//		mServerDiscover = new ServerDiscover(this);
+		mSlidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
 		
 		final float density = getResources().getDisplayMetrics().density;
-		slidingLayout.setPanelHeight((int) (30 * density + 0.5f));
-		slidingLayout.setDragView(findViewById(R.id.server_name));
-		slidingLayout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
-		slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+		mSlidingLayout.setPanelHeight((int) (30 * density + 0.5f));
+		mSlidingLayout.setDragView(findViewById(R.id.server_name));
+		mSlidingLayout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
+		mSlidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -90,6 +95,8 @@ public class MainActivity extends FragmentActivity  {
 		actionBar.addTab(tab);
 		tab = actionBar.newTab().setText(R.string.remote_control).setTabListener(tabListener);
 		actionBar.addTab(tab);
+		
+		Connectivity.getInstance().setOnConnectedListener(new SocketConnectionListener());
 	}
 
 	@Override
@@ -149,6 +156,34 @@ public class MainActivity extends FragmentActivity  {
 		@Override
 		public int getCount() {
 			return fragments.size();
+		}
+		
+	}
+	
+	private class SocketConnectionListener implements ConnectionListener {
+
+		@Override
+		public void onConnected() {
+			Message msg = new Message();
+			msg.what = 1;
+			mHandler.sendMessage(msg);
+		}
+		
+	}
+	
+	private class MyHandler extends Handler {
+		
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 1: // socket connected
+				if (mSlidingLayout.isExpanded()) {
+					mSlidingLayout.collapsePane();
+				}
+				
+				((FragmentAppList) fragments.get(0)).RefreshAppList();
+				break;
+			}
 		}
 		
 	}

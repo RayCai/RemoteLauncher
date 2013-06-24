@@ -14,9 +14,14 @@ public class Connectivity {
 	private Socket 				mSocket				= null;
 	private OutputStream 		mOut				= null;
 	private ObjectInputStream	mOis				= null;
+	private ConnectionListener	mListener			= null;
 	private final static byte	Refress_List		= 0x1;
 	private final static byte	Start_Activity		= 0x2;
 	private final static byte	Get_App_Icon		= 0x3;
+	
+	public interface ConnectionListener {
+		void onConnected();
+	}
 	
 	private static Connectivity conn				= null;
 	
@@ -35,6 +40,10 @@ public class Connectivity {
 		return buf;
 	}
 	
+	public void setOnConnectedListener(ConnectionListener listerner) {
+		mListener = listerner;
+	}
+	
 	public boolean connect(String server, int port) {
 		try {
 			if (isConnected()) return true;
@@ -42,6 +51,11 @@ public class Connectivity {
 			mSocket = new Socket(server, port);
 			mOut = mSocket.getOutputStream();
 			mOis = new ObjectInputStream(mSocket.getInputStream());
+			
+			// call listener
+			if (mListener != null) {
+				mListener.onConnected();
+			}
 			
 		} catch (IOException e) {
 			e.printStackTrace();

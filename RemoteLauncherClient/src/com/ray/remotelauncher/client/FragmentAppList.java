@@ -37,7 +37,6 @@ public class FragmentAppList extends Fragment {
 	private ProgressBar 						mLoadProgressCircle = null;
 	private ArrayList<HashMap<String, Object>> 	mAppList 			= new ArrayList<HashMap<String, Object>>();
 	private SimpleAdapter 						mGridViewAdapter 	= null;
-	private Connectivity						mSocketConn			= Connectivity.getInstance();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,10 +67,10 @@ public class FragmentAppList extends Fragment {
 		gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				if (mSocketConn.isConnected()) {
-					mSocketConn.startActivity((short)arg2);
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				Connectivity conn = Connectivity.getInstance();
+				if (conn.isConnected()) {
+					conn.startActivity((short)arg2);
 				}
 			}
 			
@@ -109,14 +108,15 @@ public class FragmentAppList extends Fragment {
 		@Override
 		protected Integer doInBackground(Integer... params) {
 			Log.i("LoadAppsTask", "=======> Start");
-			
-			if (mSocketConn.connect("192.168.0.107", 2088))
+
+			Connectivity conn = Connectivity.getInstance();
+			if (conn.isConnected())
 			{
 				File cache = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/RemoteLauncherClient/Cache");
 				if (!cache.exists())
 					cache.mkdir();
 				
-				ArrayList<ApplicationInfo> appList = mSocketConn.getApplist();
+				ArrayList<ApplicationInfo> appList = conn.getApplist();
 				Log.i("LoadAppsTask", "app count: " + appList.size());
 				
 				short i = 0;
@@ -126,7 +126,7 @@ public class FragmentAppList extends Fragment {
 					Drawable icon = GetCachedIcon(app.mPackageName, app.mTitle, cache);
 					if (icon == null) {
 						// Get icon from server
-						SerializableBitmap bitmap = mSocketConn.getAppIcon(i);
+						SerializableBitmap bitmap = conn.getAppIcon(i);
 						if (bitmap != null) {
 							icon = bitmap.getDrawable(getResources());
 							CacheIcon(app.mPackageName, app.mTitle, cache, bitmap.getBitmapBytes());
